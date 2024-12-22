@@ -44,6 +44,9 @@ RUN apt-get update && apt-get install -y \
   yasm \
   && rm -rf /var/lib/apt/lists/*
 
+# INstall Git 
+RUN apt-get update && apt-get install -y git
+
 # Copy the build scripts.
 COPY build.sh download.pl env.source fetchurl /ffmpeg-static/
 

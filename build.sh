@@ -181,11 +181,11 @@ download \
   "299b2f4ccd1b94c274f6d94ed4f1c5b8" \
   "https://github.com/georgmartius/vid.stab/archive/"
 
-download \
-  "release-2.7.4.tar.gz" \
-  "zimg-release-2.7.4.tar.gz" \
-  "1757dcc11590ef3b5a56c701fd286345" \
-  "https://github.com/sekrit-twc/zimg/archive/"
+# download \
+#   "release-2.7.4.tar.gz" \
+#   "zimg-release-2.7.4.tar.gz" \
+#   "1757dcc11590ef3b5a56c701fd286345" \
+#   "https://github.com/sekrit-twc/zimg/archive/"
 
 download \
   "v2.1.2.tar.gz" \
@@ -250,6 +250,15 @@ if [ $is_x86 -eq 1 ]; then
     make -j $jval
     make install
 fi
+
+echo "*** Building svtav1 ***"
+cd $BUILD_DIR
+rm -rf svtav1
+git clone https://gitlab.com/AOMediaCodec/SVT-AV1.git svtav1
+git checkout 
+cd $BUILD_DIR/svtav1
+cd Build/linux
+./build.sh --static --install --enable-lto
 
 echo "*** Building OpenSSL ***"
 cd $BUILD_DIR/openssl*
@@ -383,14 +392,14 @@ PATH="$BIN_DIR:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$TARGET_
 make -j $jval
 make install
 
-echo "*** Building zimg ***"
-cd $BUILD_DIR/zimg-release-*
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-./autogen.sh
-./configure --enable-static  --prefix=$TARGET_DIR --disable-shared
-sed -i 's/size_t/std::size_t/g' src/zimg/colorspace/matrix3.cpp
-make -j $jval
-make install
+# echo "*** Building zimg ***"
+# cd $BUILD_DIR/zimg-release-*
+# [ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
+# ./autogen.sh
+# ./configure --enable-static  --prefix=$TARGET_DIR --disable-shared
+# sed -i 's/size_t/std::size_t/g' src/zimg/colorspace/matrix3.cpp
+# make -j $jval
+# make install
 
 echo "*** Building libwebp ***"
 cd $BUILD_DIR/libwebp*
@@ -431,19 +440,6 @@ cd $BUILD_DIR/SDL*
 ./configure --prefix=$TARGET_DIR --disable-shared
 make -j $jval
 make install
-
-echo "*** Building RIST ***"
-cd $BUILD_DIR
-rm -rf librist
-git clone https://code.videolan.org/rist/librist.git
-cd $BUILD_DIR/librist*
-git checkout v0.2.10
-[ $rebuild -eq 1 -a -f Makefile ] && make distclean || true
-mkdir -p build
-cd build
-meson --default-library=static .. --prefix=$TARGET_DIR --bindir="../bin/" --libdir="$TARGET_DIR/lib"
-ninja
-ninja install
 
 echo "*** Building SRT ***"
 cd $BUILD_DIR/srt*
@@ -498,11 +494,10 @@ if [ "$platform" = "linux" ]; then
     --enable-libx264 \
     --enable-libx265 \
     --enable-libxvid \
-    --enable-libzimg \
     --enable-nonfree \
     --enable-openssl \
-    --enable-librist \
     --enable-libsrt
+    # --enable-libzimg \
 elif [ "$platform" = "darwin" ]; then
   [ ! -f config.status ] && PATH="$BIN_DIR:$PATH" \
   PKG_CONFIG_PATH="${TARGET_DIR}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/Cellar/openssl/1.0.2o_1/lib/pkgconfig" ./configure \
@@ -541,8 +536,8 @@ elif [ "$platform" = "darwin" ]; then
     --enable-libzimg \
     --enable-nonfree \
     --enable-openssl \
-    --enable-librist \
-    --enable-libsrt
+    --enable-libsrt \
+    --enable-libsvtav1
 fi
 
 PATH="$BIN_DIR:$PATH" make -j $jval
