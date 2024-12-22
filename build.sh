@@ -254,8 +254,7 @@ fi
 echo "*** Building svtav1 ***"
 cd $BUILD_DIR
 rm -rf svtav1
-git clone https://gitlab.com/AOMediaCodec/SVT-AV1.git svtav1
-git checkout 
+git clone https://gitlab.com/AOMediaCodec/SVT-AV1.git svtav1 
 cd $BUILD_DIR/svtav1
 cd Build/linux
 ./build.sh --static --install --enable-lto
